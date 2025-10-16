@@ -14,12 +14,13 @@ use App\Http\Controllers\TagihanController;
 */
 
 Route::get('/', function () {
-    return view('index');
+    return view('index2');
 });
 
 Route::get('/dua', function () {
-    return view('index2');
+    return view('index');
 });
+
 Route::get('/list-tahun-akademik', function() {
     $response = Http::post('http://103.23.103.43/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=list-tahun-aka');
     return response()->json($response->json());
@@ -36,8 +37,8 @@ Route::post('/api/generate-va', function (Request $request) {
 });
 
 
-Route::post('/dua', [TagihanController::class, 'cek2'])->name('tagihan.cek2');
+Route::post('/dua', [TagihanController::class, 'cek'])->name('tagihan.cek');
 
-Route::post('/', [TagihanController::class, 'cek'])->name('tagihan.cek');
+Route::post('/', [TagihanController::class, 'cek2'])->name('tagihan.cek2');
 Route::get('/tagihan/view', [TagihanController::class, 'tagihanView'])->name('tagihan.view');
 Route::post('/pembayaran/buat-va', [TagihanController::class, 'buatVA'])->name('pembayaran.buatva');

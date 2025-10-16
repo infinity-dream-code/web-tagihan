@@ -481,7 +481,7 @@ body.light-mode #togglePassword svg {
     document.addEventListener("DOMContentLoaded", function() {
     const select = document.getElementById("academic_year");
 
-fetch("{{ url('/list-tahun-akademik') }}")
+fetch("{{ str_replace('/public/index.php', '', url('/list-tahun-akademik')) }}")
         .then(response => response.json())
         .then(data => {
             select.innerHTML = ""; 
