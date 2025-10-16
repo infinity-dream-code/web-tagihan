@@ -21,7 +21,7 @@ Route::get('/dua', function () {
     return view('index2');
 });
 Route::get('/list-tahun-akademik', function() {
-    $response = Http::get('http://103.23.103.43/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=list-tahun-aka');
+    $response = Http::post('http://103.23.103.43/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=list-tahun-aka');
     return response()->json($response->json());
 });
 
