@@ -420,7 +420,7 @@
     document.addEventListener("DOMContentLoaded", function() {
     const select = document.getElementById("academic_year");
 
-  fetch("http://103.23.103.43/WEB_TAGIHAN_PROJECT/DEMO_BMI_MULTIPLE_CF/public/list-tahun-akademik")
+  fetch("http://103.23.103.43/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=list-tahun-aka")
         .then(response => response.json())
         .then(data => {
             select.innerHTML = ""; 
