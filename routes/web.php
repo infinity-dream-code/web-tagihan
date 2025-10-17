@@ -13,11 +13,19 @@ Route::get('/dua', function () {
     return view('index');
 });
 
+
 Route::get('/list-tahun-akademik', function() {
     try {
         $response = Http::timeout(30)
             ->withoutVerifying()
-            ->get('http://103.23.103.43/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=list-tahun-aka');
+            ->get('http://10.99.23.111/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php', [
+                'path' => 'list-tahun-aka'
+            ]);
+
+        \Log::info('WS Response', [
+            'status' => $response->status(),
+            'body' => $response->body()
+        ]);
 
         if ($response->successful()) {
             return response()->json($response->json());
@@ -25,9 +33,15 @@ Route::get('/list-tahun-akademik', function() {
         
         return response()->json([
             'status' => false,
-            'message' => 'Gagal mengambil data tahun akademik'
+            'message' => 'API tidak memberikan response yang valid'
         ], 500);
+        
     } catch (\Exception $e) {
+        \Log::error('Error fetching tahun akademik', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        
         return response()->json([
             'status' => false,
             'message' => 'Gagal mengambil data tahun akademik',
