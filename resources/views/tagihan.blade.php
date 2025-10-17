@@ -150,7 +150,7 @@ const nc=(s.va_number||'').replace(/^751000/,'');
 
 console.log('Request cek-tagihan:', {va: nc, tahun_akademik: s.tahun_akademik});
 
-const r = await fetch("/api/cek-tagihan", {
+const r = await fetch("http://10.99.23.111/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=cek-tagihan", {
     method: "POST",
     headers: { 
         "Content-Type": "application/json",
@@ -193,7 +193,7 @@ const payload={
 
 console.log('Request generate-va:', payload);
 
-const rr = await fetch("/api/generate-va", {
+const rr = await fetch("http://10.99.23.111/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=generate-va", {
     method: "POST",
     headers: { 
         "Content-Type": "application/json",

@@ -17,7 +17,7 @@ class TagihanController extends Controller
         'academic_year' => 'required|string'
     ]);
 
-    $response = Http::post('http://103.23.103.43/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=cek-tagihan', [
+    $response = Http::post('http://10.99.23.111/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=cek-tagihan', [
         'va' => $request->no_cust,
         'tahun_akademik' => $request->academic_year
     ]);
@@ -39,7 +39,7 @@ public function cek2(Request $request)
         'academic_year' => 'required|string'
     ]);
 
-    $response = Http::post('http://103.23.103.43/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=cek-tagihan-pw', [
+    $response = Http::post('http://10.99.23.111/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=cek-tagihan-pw', [
         'va' => $request->no_cust,
         'password' => $request->password,
         'tahun_akademik' => $request->academic_year

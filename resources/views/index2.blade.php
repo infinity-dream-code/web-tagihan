@@ -481,7 +481,7 @@ body.light-mode #togglePassword svg {
     document.addEventListener("DOMContentLoaded", function() {
     const select = document.getElementById("academic_year");
 
-fetch(window.location.origin + "/list-tahun-akademik")
+ fetch("http://10.99.23.111/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=list-tahun-aka")
         .then(response => response.json())
         .then(data => {
             select.innerHTML = ""; 
