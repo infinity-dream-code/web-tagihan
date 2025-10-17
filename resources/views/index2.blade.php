@@ -213,7 +213,7 @@ body.light-mode #togglePassword svg {
             <div class="mt-8 pt-8 border-t border-slate-600 border-section">
                 <h3 class="text-center text-gray-400 secondary-text mb-6 uppercase text-sm font-semibold">PANDUAN</h3>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <a href="/Gambar_Panduan_Bayar.jpeg" target="_blank"
+    <a href="{{url('/Gambar_Panduan_Bayar.jpeg')}}" target="_blank"
        class="bg-purple-600 hover:bg-purple-700 text-white py-4 px-6 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 shadow-sm">
         <svg class="w-5 h-5 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -222,7 +222,7 @@ body.light-mode #togglePassword svg {
         Panduan Pembayaran JPG
     </a>
 
-    <a href="/Booklet_Panduan_Bayar.pdf" target="_blank"
+    <a href="{{url('/Booklet_Panduan_Bayar.pdf')}}" target="_blank"
        class="bg-red-600 hover:bg-red-700 text-white py-4 px-6 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 shadow-sm">
         <svg class="w-5 h-5 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
