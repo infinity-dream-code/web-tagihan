@@ -50,22 +50,20 @@ Route::get('/list-tahun-akademik', function() {
     }
 });
 
-Route::post('/api/cek-tagihan', function (Request $request) {
+Route::post('/cek-tagihan', function(Request $request) {
     try {
-        \Log::info('Cek Tagihan Request', $request->all());
-        
         $response = Http::timeout(30)
             ->withoutVerifying()
             ->withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json'
             ])
-            ->post('http://103.23.103.43/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=cek-tagihan', [
+            ->post('http://10.99.23.111/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=cek-tagihan', [
                 'va' => $request->input('va'),
                 'tahun_akademik' => $request->input('tahun_akademik')
             ]);
-        
-        \Log::info('Cek Tagihan Response', [
+
+        \Log::info('WS cek-tagihan response', [
             'status' => $response->status(),
             'body' => $response->body()
         ]);
@@ -76,15 +74,13 @@ Route::post('/api/cek-tagihan', function (Request $request) {
         
         return response()->json([
             'status' => false,
-            'message' => 'Gagal cek tagihan',
-            'response' => $response->body()
-        ], $response->status());
+            'message' => 'Gagal mengecek tagihan'
+        ], 500);
         
     } catch (\Exception $e) {
-        \Log::error('Cek Tagihan Error', [
-            'message' => $e->getMessage(),
-            'line' => $e->getLine(),
-            'file' => $e->getFile()
+        \Log::error('Error cek-tagihan', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
         ]);
         
         return response()->json([
@@ -93,25 +89,21 @@ Route::post('/api/cek-tagihan', function (Request $request) {
             'error' => $e->getMessage()
         ], 500);
     }
-});
+})->name('cek-tagihan');
 
-Route::post('/api/cek-tagihan-pw', function (Request $request) {
+Route::post('/generate-va', function(Request $request) {
     try {
-        \Log::info('Cek Tagihan PW Request', $request->all());
-        
         $response = Http::timeout(30)
             ->withoutVerifying()
             ->withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json'
             ])
-            ->post('http://103.23.103.43/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=cek-tagihan-pw', [
-                'va' => $request->input('va'),
-                'password' => $request->input('password'),
-                'tahun_akademik' => $request->input('tahun_akademik')
-            ]);
-        
-        \Log::info('Cek Tagihan PW Response', [
+            ->post('http://10.99.23.111/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=generate-va', 
+                $request->all()
+            );
+
+        \Log::info('WS generate-va response', [
             'status' => $response->status(),
             'body' => $response->body()
         ]);
@@ -122,13 +114,13 @@ Route::post('/api/cek-tagihan-pw', function (Request $request) {
         
         return response()->json([
             'status' => false,
-            'message' => 'Gagal cek tagihan',
-            'response' => $response->body()
-        ], $response->status());
+            'message' => 'Gagal generate VA'
+        ], 500);
         
     } catch (\Exception $e) {
-        \Log::error('Cek Tagihan PW Error', [
-            'message' => $e->getMessage()
+        \Log::error('Error generate-va', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
         ]);
         
         return response()->json([
@@ -137,53 +129,7 @@ Route::post('/api/cek-tagihan-pw', function (Request $request) {
             'error' => $e->getMessage()
         ], 500);
     }
-});
-
-Route::post('/api/generate-va', function (Request $request) {
-    try {
-        \Log::info('Generate VA Request', $request->all());
-        
-        $response = Http::timeout(30)
-            ->withoutVerifying()
-            ->withHeaders([
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json'
-            ])
-            ->post('http://103.23.103.43/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=generate-va', [
-                'custid' => $request->input('custid'),
-                'nocust' => $request->input('nocust'),
-                'namacust' => $request->input('namacust'),
-                'array_tagihan' => $request->input('array_tagihan'),
-                'total' => $request->input('total')
-            ]);
-        
-        \Log::info('Generate VA Response', [
-            'status' => $response->status(),
-            'body' => $response->body()
-        ]);
-
-        if ($response->successful()) {
-            return response()->json($response->json());
-        }
-        
-        return response()->json([
-            'status' => false,
-            'message' => 'Gagal generate VA',
-            'response' => $response->body()
-        ], $response->status());
-        
-    } catch (\Exception $e) {
-        \Log::error('Generate VA Error', [
-            'message' => $e->getMessage()
-        ]);
-        
-        return response()->json([
-            'status' => false,
-            'message' => 'Terjadi kesalahan',
-            'error' => $e->getMessage()
-        ], 500);
-    }
-});
+})->name('generate-va');
 
 Route::post('/dua', [TagihanController::class, 'cek'])->name('tagihan.cek');
 

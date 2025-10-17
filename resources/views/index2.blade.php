@@ -481,7 +481,7 @@ body.light-mode #togglePassword svg {
     document.addEventListener("DOMContentLoaded", function() {
     const select = document.getElementById("academic_year");
 
- fetch("http://10.99.23.111/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=list-tahun-aka")
+  fetch("{{ url('/list-tahun-akademik') }}")
         .then(response => response.json())
         .then(data => {
             select.innerHTML = ""; 
@@ -1016,7 +1016,7 @@ function showPaymentModal() {
     modal.classList.add('active');
 
     setTimeout(() => {
-        content.innerHTML = '<iframe src="/tagihan/view" style="width:100%; height:85vh; border:none; border-radius:0.5rem;"></iframe>';
+        content.innerHTML = '<iframe src="{/tagihan/view}" style="width:100%; height:85vh; border:none; border-radius:0.5rem;"></iframe>';
     }, 500);
 }
 

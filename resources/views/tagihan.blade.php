@@ -150,12 +150,12 @@ const nc=(s.va_number||'').replace(/^751000/,'');
 
 console.log('Request cek-tagihan:', {va: nc, tahun_akademik: s.tahun_akademik});
 
-const r = await fetch("http://10.99.23.111/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=cek-tagihan", {
+const r = await fetch("{{ url('/cek-tagihan') }}", {
     method: "POST",
     headers: { 
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "X-Requested-With": "XMLHttpRequest"
+        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     },
     body: JSON.stringify({ 
         va: nc, 
@@ -193,12 +193,12 @@ const payload={
 
 console.log('Request generate-va:', payload);
 
-const rr = await fetch("http://10.99.23.111/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=generate-va", {
+const rr = await fetch("{{ url('/generate-va') }}", {
     method: "POST",
     headers: { 
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "X-Requested-With": "XMLHttpRequest"
+        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     },
     body: JSON.stringify(payload)
 });
