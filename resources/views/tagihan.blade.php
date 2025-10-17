@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <title>Konfirmasi Pembayaran</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
@@ -126,36 +127,43 @@ btn.disabled = true;
 btn.textContent = 'Memproses...';
 
 try {
+
+const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+if (!csrfMeta) {
+    alert('Error: CSRF token tidak ditemukan. Silakan refresh halaman.');
+    return;
+}
+
 if(!turnstileToken){
-alert('Silakan selesaikan verifikasi keamanan terlebih dahulu!');
-return;
+    alert('Silakan selesaikan verifikasi keamanan terlebih dahulu!');
+    return;
 }
 
 const s=JSON.parse((typeof sessionStorage!=='undefined'?sessionStorage.getItem('siswa_data'):null)||'{}');
 const t=JSON.parse((typeof sessionStorage!=='undefined'?sessionStorage.getItem('selected_tagihan'):null)||'[]');
 
 if(t.length===0){
-alert('Tidak ada tagihan yang dipilih!');
-return;
+    alert('Tidak ada tagihan yang dipilih!');
+    return;
 }
 
 let total=0,ids=[];
 t.forEach(i=>{
-let n=typeof i.total_tagihan==='string'?parseInt(i.total_tagihan.replace(/\./g,'').replace(/,/g,'')):parseInt(i.total_tagihan);
-total+=n;
-ids.push(i.AA||0);
+    let n=typeof i.total_tagihan==='string'?parseInt(i.total_tagihan.replace(/\./g,'').replace(/,/g,'')):parseInt(i.total_tagihan);
+    total+=n;
+    ids.push(i.AA||0);
 });
 
 const nc=(s.va_number||'').replace(/^751000/,'');
 
 console.log('Request cek-tagihan:', {va: nc, tahun_akademik: s.tahun_akademik});
 
-const r = await fetch("{{ url('/cek-tagihan') }}", {
+const r = await fetch("{{ route('cek-tagihan') }}", {
     method: "POST",
     headers: { 
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        "X-CSRF-TOKEN": csrfMeta.getAttribute('content')
     },
     body: JSON.stringify({ 
         va: nc, 
@@ -193,12 +201,12 @@ const payload={
 
 console.log('Request generate-va:', payload);
 
-const rr = await fetch("{{ url('/generate-va') }}", {
+const rr = await fetch("{{ route('generate-va') }}", {
     method: "POST",
     headers: { 
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        "X-CSRF-TOKEN": csrfMeta.getAttribute('content')
     },
     body: JSON.stringify(payload)
 });

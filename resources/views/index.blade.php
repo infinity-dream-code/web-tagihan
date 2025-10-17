@@ -954,10 +954,9 @@ function showPaymentModal() {
     }
 
     modal.classList.add('active');
-
-    setTimeout(() => {
-        content.innerHTML = '<iframe src="{/tagihan/view}" style="width:100%; height:85vh; border:none; border-radius:0.5rem;"></iframe>';
-    }, 500);
+setTimeout(() => {
+    content.innerHTML = '<iframe src="{{url('/tagihan/view')}}" style="width:100%; height:85vh; border:none; border-radius:0.5rem;"></iframe>';
+}, 500);
 }
 
 
