@@ -25,7 +25,7 @@ Route::post('/cek-tagihan', function (Request $request) {
                 'Accept' => 'application/json'
             ])
             ->post(config('services.tagihan_ws.url').'?path=cek-tagihan', [
-                'va' => $request->input('va'),
+                'va' => TagihanController::normalizeVa($request->input('va')),
                 'tahun_akademik' => $request->input('tahun_akademik')
             ]);
 

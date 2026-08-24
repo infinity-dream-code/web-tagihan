@@ -18,6 +18,13 @@ class TagihanController extends Controller
         return $url;
     }
 
+    public static function normalizeVa(?string $va): string
+    {
+        $va = preg_replace('/\s+/', '', (string) $va);
+
+        return (string) preg_replace('/^(797766|751000)/', '', $va);
+    }
+
     public function cek(Request $request)
     {
         $request->validate([
@@ -28,7 +35,7 @@ class TagihanController extends Controller
         $response = Http::timeout(30)
             ->withoutVerifying()
             ->post($this->wsUrl('cek-tagihan'), [
-                'va' => $request->no_cust,
+                'va' => self::normalizeVa($request->no_cust),
                 'tahun_akademik' => $request->academic_year
             ]);
 
@@ -52,7 +59,7 @@ class TagihanController extends Controller
         $response = Http::timeout(30)
             ->withoutVerifying()
             ->post($this->wsUrl('cek-tagihan-pw'), [
-                'va' => $request->no_cust,
+                'va' => self::normalizeVa($request->no_cust),
                 'password' => $request->password,
                 'tahun_akademik' => $request->academic_year
             ]);
