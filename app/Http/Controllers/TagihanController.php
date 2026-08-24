@@ -55,7 +55,7 @@ public function cek2(Request $request)
         ]);
     }
 
-    return view('index2', compact('result'))
+    return view('index3', compact('result'))
         ->with([
             'va' => $request->no_cust,
             'academic_year' => $request->academic_year

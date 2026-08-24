@@ -3,7 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cek Tagihan dan Pembayaran</title>
+<title>Cek Tagihan | Sulaiman Al Fauzan</title>
+<link rel="icon" type="image/jpeg" href="{{ asset('logo.jpeg') }}">
+<link rel="apple-touch-icon" href="{{ asset('logo.jpeg') }}">
+<meta name="theme-color" content="#0f172a">
+<script>
+(function(){
+  try {
+    if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+  } catch (e) {}
+})();
+</script>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -11,17 +21,21 @@
 *{box-sizing:border-box}
 :root{
 --bg:#f8fafc;--surface:#ffffff;--surface2:#f1f5f9;--border:#e2e8f0;--border2:#cbd5e1;
---text:#0f172a;--text2:#475569;--text3:#94a3b8;
+--text:#0f172a;--text2:#475569;--text3:#64748b;
 --blue:#2563eb;--blue-h:#1d4ed8;--green:#16a34a;--green-h:#15803d;
 --danger:#dc2626;
+color-scheme:light;
+}
+html.dark{
+--bg:#0f172a;--surface:#1e293b;--surface2:#273549;--border:#334155;--border2:#475569;
+--text:#f1f5f9;--text2:#cbd5e1;--text3:#94a3b8;
+color-scheme:dark;
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .2s,color .2s}
-body.dark{
---bg:#0f172a;--surface:#1e293b;--surface2:#0f172a;--border:#1e293b;--border2:#334155;
---text:#f1f5f9;--text2:#94a3b8;--text3:#475569;
-}
 .wrap{max-width:720px;margin:0 auto;padding:2rem 1.25rem}
-.topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2rem}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2rem;gap:12px}
+.brand-wrap{display:flex;align-items:center;gap:12px;min-width:0}
+.brand-logo{width:48px;height:48px;border-radius:10px;object-fit:cover;flex-shrink:0;border:1px solid var(--border);background:var(--surface)}
 .brand{font-size:11px;font-weight:600;letter-spacing:.07em;color:var(--text3);text-transform:uppercase;margin-bottom:5px}
 h1{font-size:21px;font-weight:600;color:var(--text);line-height:1.3}
 .theme-btn{display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:8px;border:1px solid var(--border2);background:var(--surface);font-size:13px;color:var(--text2);cursor:pointer;transition:background .15s,border .15s;flex-shrink:0;margin-top:4px}
@@ -31,9 +45,12 @@ h1{font-size:21px;font-weight:600;color:var(--text);line-height:1.3}
 .field{margin-bottom:1.125rem}
 .field label{display:block;font-size:13px;font-weight:500;color:var(--text2);margin-bottom:6px}
 .field label em{color:var(--danger);font-style:normal}
-.field input,.field select{width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:14px;outline:none;transition:border .15s,background .15s;appearance:none}
-.field input:focus,.field select:focus{border-color:var(--blue);background:var(--surface)}
+.field input,.field select{width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border2);background-color:var(--surface2);color:var(--text);font-size:14px;outline:none;transition:border .15s,background .15s}
+.field select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2364748b' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:16px;padding-right:36px}
+html.dark .field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2394a3b8' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")}
+.field input:focus,.field select:focus{border-color:var(--blue);background-color:var(--surface)}
 .field input::placeholder{color:var(--text3)}
+.field select option{background:var(--surface);color:var(--text)}
 .pw-wrap{position:relative}
 .pw-wrap input{padding-right:40px}
 .pw-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;line-height:1;display:flex;align-items:center}
@@ -42,23 +59,18 @@ h1{font-size:21px;font-weight:600;color:var(--text);line-height:1.3}
 .submit-btn{width:100%;padding:11px 16px;border-radius:8px;border:none;background:var(--blue);color:#fff;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:1.375rem;transition:background .15s}
 .submit-btn:hover{background:var(--blue-h)}
 .divider{border:none;border-top:1px solid var(--border);margin:1.5rem 0}
-.guide-wrap{padding-top:1.25rem;border-top:1px solid var(--border);margin-top:1.375rem}
-.guide-lbl{font-size:11px;font-weight:600;letter-spacing:.07em;color:var(--text3);text-transform:uppercase;margin-bottom:.875rem;text-align:center}
-.guide-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.guide-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;transition:background .15s}
-.guide-btn:hover{background:var(--border)}
-.guide-btn svg{flex-shrink:0}
 .student-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.375rem}
 .sf label{font-size:12px;color:var(--text3);margin-bottom:3px}
 .sf p{font-size:15px;font-weight:600;color:var(--text)}
 .tbl-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:.875rem;flex-wrap:wrap;gap:.5rem}
 .tbl-title{font-size:15px;font-weight:600;color:var(--text)}
 .tbl-controls{display:flex;align-items:center;gap:8px}
-.tbl-controls select{padding:5px 8px;border-radius:7px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:12px;outline:none;cursor:pointer}
+.tbl-controls select{padding:5px 28px 5px 8px;border-radius:7px;border:1px solid var(--border2);background-color:var(--surface2);color:var(--text);font-size:12px;outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%2364748b' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+html.dark .tbl-controls select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%2394a3b8' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")}
 .btn-showall{padding:5px 10px;border-radius:7px;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);font-size:12px;cursor:pointer;transition:background .15s}
 .btn-showall:hover{background:var(--border)}
 .tbl-info{font-size:12px;color:var(--text3)}
-.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border);background:var(--surface)}
 table{width:100%;border-collapse:collapse;font-size:13px}
 thead tr{background:var(--surface2)}
 th{padding:10px 12px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.05em;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap}
@@ -67,20 +79,21 @@ tbody tr:last-child td{border-bottom:none}
 tbody tr:hover{background:var(--surface2)}
 .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:600}
 .badge-unpaid{background:#fef2f2;color:#b91c1c}
-body.dark .badge-unpaid{background:#450a0a;color:#fca5a5}
+html.dark .badge-unpaid{background:#450a0a;color:#fca5a5}
 .badge-paid{background:#f0fdf4;color:#15803d}
-body.dark .badge-paid{background:#052e16;color:#86efac}
+html.dark .badge-paid{background:#052e16;color:#86efac}
 .btn-detail{padding:4px 10px;border-radius:7px;border:1px solid #bfdbfe;color:#2563eb;background:transparent;font-size:12px;cursor:pointer;transition:background .15s}
 .btn-detail:hover{background:#eff6ff}
-body.dark .btn-detail{border-color:#1e3a5f;color:#93c5fd}
-body.dark .btn-detail:hover{background:#0c1a2e}
+html.dark .btn-detail{border-color:#1e3a5f;color:#93c5fd}
+html.dark .btn-detail:hover{background:#0c1a2e}
 .pagination{display:flex;gap:5px;justify-content:center;margin-top:.875rem;flex-wrap:wrap}
 .pg-btn{padding:5px 10px;border-radius:7px;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);font-size:12px;cursor:pointer;transition:background .15s}
 .pg-btn:hover:not(.pg-active){background:var(--border)}
 .pg-active{background:var(--blue);color:#fff;border-color:var(--blue)}
-.hint{font-size:12px;color:var(--danger);margin-top:.75rem}
-.pay-btn{width:100%;margin-top:1.125rem;padding:11px 16px;border-radius:8px;border:none;background:var(--green);color:#fff;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s}
-.pay-btn:hover{background:var(--green-h)}
+.error-box{margin-top:1rem;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:1rem 1.25rem}
+.error-box p{color:#b91c1c;font-size:14px;margin:0}
+html.dark .error-box{background:#450a0a;border-color:#7f1d1d}
+html.dark .error-box p{color:#fca5a5}
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center}
 .modal-bg.open{display:flex}
 .modal-box{background:var(--surface);border:1px solid var(--border2);border-radius:14px;width:92%;max-width:520px;max-height:85vh;overflow-y:auto}
@@ -96,25 +109,27 @@ body.dark .btn-detail:hover{background:#0c1a2e}
 .modal-foot{padding:.875rem 1.25rem;border-top:1px solid var(--border)}
 .btn-close-full{width:100%;padding:9px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;transition:background .15s}
 .btn-close-full:hover{background:var(--surface2)}
-.payment-iframe-wrap{padding:0}
-.payment-iframe-wrap iframe{width:100%;height:85vh;border:none;border-radius:0 0 14px 14px;display:block}
 .footer{text-align:center;font-size:12px;color:var(--text3);margin-top:2rem;padding-bottom:.75rem}
 .scroll-top{position:fixed;bottom:1.5rem;right:1.5rem;width:38px;height:38px;border-radius:50%;border:1px solid var(--border2);background:var(--surface);color:var(--text2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s}
 .scroll-top:hover{background:var(--surface2)}
 @media(max-width:500px){
 .student-grid{grid-template-columns:1fr}
-.guide-grid{grid-template-columns:1fr}
+.brand-logo{width:40px;height:40px}
+h1{font-size:18px}
 }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="topbar">
-    <div>
-      <div class="brand">ICT Billing System</div>
-      <h1>Cek tagihan &amp; pembayaran</h1>
+    <div class="brand-wrap">
+      <img src="{{ asset('logo.jpeg') }}" alt="Sulaiman Al Fauzan" class="brand-logo" width="48" height="48">
+      <div>
+        <div class="brand">Sulaiman Al Fauzan</div>
+        <h1>Cek tagihan</h1>
+      </div>
     </div>
-    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">
+    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn" type="button">
       <svg id="themeIcon" width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
       <span id="themeLabel">Mode gelap</span>
     </button>
@@ -126,7 +141,7 @@ body.dark .btn-detail:hover{background:#0c1a2e}
       <div class="section-title">Informasi akun</div>
       <div class="field">
         <label>Nomor virtual account <em>*</em></label>
-        <input type="text" name="no_cust" id="noCust" placeholder="751000xxxxxxxx" required>
+        <input type="text" name="no_cust" id="noCust" placeholder="751000xxxxxxxx" value="{{ old('no_cust', $va ?? '') }}" required>
       </div>
       <div class="field">
         <label>Password <em>*</em></label>
@@ -158,25 +173,36 @@ body.dark .btn-detail:hover{background:#0c1a2e}
     </form>
 
     @if(session('error'))
-    <script>Swal.fire({icon:'error',title:'Gagal',text:'{{ session('error') }}',confirmButtonColor:'#dc2626'});</script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var dark = document.documentElement.classList.contains('dark');
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal',
+        text: @json(session('error')),
+        confirmButtonColor: '#dc2626',
+        background: dark ? '#1e293b' : '#fff',
+        color: dark ? '#f1f5f9' : '#0f172a'
+      });
+    });
+    </script>
     @endif
     @if(session('success'))
-    <script>Swal.fire({icon:'success',title:'Berhasil',text:'{{ session('success') }}',timer:2000,showConfirmButton:false});</script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var dark = document.documentElement.classList.contains('dark');
+      Swal.fire({
+        icon: 'success',
+        title: 'Berhasil',
+        text: @json(session('success')),
+        timer: 2000,
+        showConfirmButton: false,
+        background: dark ? '#1e293b' : '#fff',
+        color: dark ? '#f1f5f9' : '#0f172a'
+      });
+    });
+    </script>
     @endif
-
-    <div class="guide-wrap">
-      <div class="guide-lbl">Panduan pembayaran</div>
-      <div class="guide-grid">
-        <a href="/Gambar_Panduan_Bayar.jpeg" target="_blank" class="guide-btn">
-          <svg width="15" height="15" fill="none" stroke="#7c3aed" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          Panduan JPG
-        </a>
-        <a href="/Booklet_Panduan_Bayar.pdf" target="_blank" class="guide-btn">
-          <svg width="15" height="15" fill="none" stroke="#dc2626" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          Panduan PDF
-        </a>
-      </div>
-    </div>
   </div>
 
   @if(isset($result))
@@ -203,7 +229,7 @@ body.dark .btn-detail:hover{background:#0c1a2e}
               <option value="50">50</option>
               <option value="100">100</option>
             </select>
-            <button class="btn-showall" onclick="showAllTagihan()">Tampilkan semua</button>
+            <button class="btn-showall" type="button" onclick="showAllTagihan()">Tampilkan semua</button>
           </div>
         </div>
         <div id="tagihanInfo" class="tbl-info" style="margin-bottom:.75rem"></div>
@@ -211,7 +237,6 @@ body.dark .btn-detail:hover{background:#0c1a2e}
           <table>
             <thead>
               <tr>
-                <th style="width:36px"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
                 <th>No</th>
                 <th>Urutan</th>
                 <th>Nama tagihan</th>
@@ -224,7 +249,6 @@ body.dark .btn-detail:hover{background:#0c1a2e}
             <tbody id="tagihanTableBody">
               @forelse($result['data']['tagihan'] as $i => $tagih)
               <tr data-index="{{ $i }}">
-                <td><input type="checkbox" name="selected_tagihan[]" value="{{ $tagih['id'] ?? $i }}" class="tagihan-checkbox"></td>
                 <td>{{ $i+1 }}</td>
                 <td>{{ $tagih['FURUTAN'] ?? '-' }}</td>
                 <td>{{ ucwords(str_replace('_', ' ', strtolower($tagih['nama_tagihan']))) }}</td>
@@ -240,17 +264,12 @@ body.dark .btn-detail:hover{background:#0c1a2e}
                 <td><button type="button" class="btn-detail" onclick='showDetailModal(@json($tagih))'>Lihat</button></td>
               </tr>
               @empty
-              <tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text3)">Tidak ada data tersedia</td></tr>
+              <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text3)">Tidak ada data tersedia</td></tr>
               @endforelse
             </tbody>
           </table>
         </div>
         <div id="tagihanPagination" class="pagination"></div>
-        <p class="hint">* Pilih satu atau beberapa tagihan untuk dibayarkan</p>
-        <button type="button" onclick="showPaymentModal()" class="pay-btn">
-          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-          Bayar tagihan
-        </button>
 
         <div class="divider"></div>
 
@@ -263,7 +282,7 @@ body.dark .btn-detail:hover{background:#0c1a2e}
               <option value="50">50</option>
               <option value="100">100</option>
             </select>
-            <button class="btn-showall" onclick="showAllLunas()">Tampilkan semua</button>
+            <button class="btn-showall" type="button" onclick="showAllLunas()">Tampilkan semua</button>
           </div>
         </div>
         <div id="lunasInfo" class="tbl-info" style="margin-bottom:.75rem"></div>
@@ -299,20 +318,20 @@ body.dark .btn-detail:hover{background:#0c1a2e}
       </div>
       <script>setTimeout(()=>{document.getElementById('resultSection').scrollIntoView({behavior:'smooth',block:'start'})},100);</script>
     @else
-      <div style="margin-top:1rem;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:1rem 1.25rem">
-        <p style="color:#b91c1c;font-size:14px">{{ $result['message'] ?? 'Data tidak ditemukan' }}</p>
+      <div class="error-box">
+        <p>{{ $result['message'] ?? 'Data tidak ditemukan' }}</p>
       </div>
     @endif
   @endif
 
-  <div class="footer">© 2024 PT. Inovasi Cipta Teknologi. All rights reserved.</div>
+  <div class="footer">© {{ date('Y') }} Sulaiman Al Fauzan. All rights reserved.</div>
 </div>
 
 <div id="detailModal" class="modal-bg">
   <div class="modal-box">
     <div class="modal-head">
       <h3>Detail tagihan</h3>
-      <button class="modal-x" onclick="closeDetailModal()" aria-label="Tutup">
+      <button class="modal-x" onclick="closeDetailModal()" aria-label="Tutup" type="button">
         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
@@ -322,32 +341,24 @@ body.dark .btn-detail:hover{background:#0c1a2e}
       <div id="mDetailTable"></div>
     </div>
     <div class="modal-foot">
-      <button class="btn-close-full" onclick="closeDetailModal()">Tutup</button>
+      <button class="btn-close-full" onclick="closeDetailModal()" type="button">Tutup</button>
     </div>
   </div>
 </div>
 
-<div id="paymentModal" class="modal-bg">
-  <div class="modal-box" style="max-width:960px">
-    <div class="modal-head">
-      <h3>Konfirmasi pembayaran</h3>
-      <button class="modal-x" onclick="closePaymentModal()" aria-label="Tutup">
-        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-      </button>
-    </div>
-    <div id="paymentContent" class="payment-iframe-wrap"></div>
-  </div>
-</div>
-
-<button class="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll ke atas">
+<button class="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll ke atas" type="button">
   <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
 </button>
 
 <script>
-let currentTheme = 'light';
+let currentTheme = (typeof localStorage !== 'undefined' && localStorage.getItem('theme') === 'dark') ? 'dark' : 'light';
 let turnstileToken = null;
 let tagihanPage = 1, tagihanPerPageVal = 10, tagihanAll = false;
 let lunasPage = 1, lunasPerPageVal = 10, lunasAll = false;
+const preselectedYear = @json(old('academic_year', $academic_year ?? 'all'));
+
+const ICON_MOON = '<path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>';
+const ICON_SUN = '<path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>';
 
 function togglePw() {
   const f = document.getElementById('pwField');
@@ -357,23 +368,28 @@ function togglePw() {
   else { f.type = 'password'; e.style.display = 'block'; o.style.display = 'none'; }
 }
 
-function toggleTheme() {
-  const body = document.body;
+function syncThemeUI(theme) {
+  currentTheme = theme;
   const lbl = document.getElementById('themeLabel');
   const icon = document.getElementById('themeIcon');
-  if (currentTheme === 'light') {
-    currentTheme = 'dark';
-    body.classList.add('dark');
+  if (theme === 'dark') {
     lbl.textContent = 'Mode terang';
-    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>';
+    icon.innerHTML = ICON_SUN;
   } else {
-    currentTheme = 'light';
-    body.classList.remove('dark');
     lbl.textContent = 'Mode gelap';
-    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>';
+    icon.innerHTML = ICON_MOON;
   }
-  localStorage.setItem('theme', currentTheme);
-  resetTurnstile();
+}
+
+function applyTheme(theme, resetWidget) {
+  document.documentElement.classList.toggle('dark', theme === 'dark');
+  localStorage.setItem('theme', theme);
+  syncThemeUI(theme);
+  if (resetWidget) resetTurnstile();
+}
+
+function toggleTheme() {
+  applyTheme(currentTheme === 'light' ? 'dark' : 'light', true);
 }
 
 function initTurnstile() {
@@ -398,6 +414,9 @@ function resetTurnstile() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  syncThemeUI(currentTheme);
+  document.documentElement.classList.toggle('dark', currentTheme === 'dark');
+
   const s = document.getElementById('academic_year');
   if (s) {
     fetch("{{ url('/list-tahun-akademik') }}")
@@ -414,12 +433,13 @@ document.addEventListener('DOMContentLoaded', () => {
             s.appendChild(o);
           });
         }
+        const match = Array.from(s.options).find(o => o.value === preselectedYear);
+        s.value = match ? preselectedYear : 'all';
       })
       .catch(() => { s.innerHTML = '<option>Gagal memuat data</option>'; });
   }
   initTagihanPagination();
   initLunasPagination();
-  if (localStorage.getItem('theme') === 'dark') toggleTheme();
 });
 
 window.onload = initTurnstile;
@@ -434,8 +454,8 @@ function paginateRows(rows, page, perPage, showAll, infoId, paginationFn) {
   rows.forEach(r => r.style.display = 'none');
   if (showAll) { rows.forEach(r => r.style.display = ''); }
   else {
-    const s = (page - 1) * perPage;
-    for (let i = s; i < Math.min(s + perPage, total); i++) rows[i].style.display = '';
+    const start = (page - 1) * perPage;
+    for (let i = start; i < Math.min(start + perPage, total); i++) rows[i].style.display = '';
   }
   const s2 = showAll ? 1 : (page - 1) * perPage + 1;
   const e2 = showAll ? total : Math.min(page * perPage, total);
@@ -450,15 +470,15 @@ function renderPagination(id, totalPages, totalRows, showAll, getCurrent, goTo) 
   if (showAll || totalRows === 0) { el.innerHTML = ''; return; }
   const cur = getCurrent();
   let h = '';
-  if (cur > 1) h += `<button class="pg-btn" onclick="${goTo}(${cur-1})">‹</button>`;
+  if (cur > 1) h += `<button class="pg-btn" type="button" onclick="${goTo}(${cur-1})">‹</button>`;
   const max = 5;
   let sp = Math.max(1, cur - Math.floor(max/2));
   let ep = Math.min(totalPages, sp + max - 1);
   if (ep - sp < max - 1) sp = Math.max(1, ep - max + 1);
-  if (sp > 1) { h += `<button class="pg-btn" onclick="${goTo}(1)">1</button>`; if (sp > 2) h += `<span style="padding:5px 4px;color:var(--text3)">…</span>`; }
-  for (let i = sp; i <= ep; i++) h += `<button class="pg-btn${i === cur ? ' pg-active' : ''}" onclick="${goTo}(${i})">${i}</button>`;
-  if (ep < totalPages) { if (ep < totalPages - 1) h += `<span style="padding:5px 4px;color:var(--text3)">…</span>`; h += `<button class="pg-btn" onclick="${goTo}(${totalPages})">${totalPages}</button>`; }
-  if (cur < totalPages) h += `<button class="pg-btn" onclick="${goTo}(${cur+1})">›</button>`;
+  if (sp > 1) { h += `<button class="pg-btn" type="button" onclick="${goTo}(1)">1</button>`; if (sp > 2) h += `<span style="padding:5px 4px;color:var(--text3)">…</span>`; }
+  for (let i = sp; i <= ep; i++) h += `<button class="pg-btn${i === cur ? ' pg-active' : ''}" type="button" onclick="${goTo}(${i})">${i}</button>`;
+  if (ep < totalPages) { if (ep < totalPages - 1) h += `<span style="padding:5px 4px;color:var(--text3)">…</span>`; h += `<button class="pg-btn" type="button" onclick="${goTo}(${totalPages})">${totalPages}</button>`; }
+  if (cur < totalPages) h += `<button class="pg-btn" type="button" onclick="${goTo}(${cur+1})">›</button>`;
   el.innerHTML = h;
 }
 
@@ -480,10 +500,6 @@ function changeLunasPerPage() { lunasPerPageVal = parseInt(document.getElementBy
 function showAllTagihan() { tagihanAll = true; initTagihanPagination(); }
 function showAllLunas() { lunasAll = true; initLunasPagination(); }
 
-function toggleSelectAll(cb) {
-  getRows('tagihanTableBody').filter(r => r.style.display !== 'none').forEach(r => { const c = r.querySelector('.tagihan-checkbox'); if (c) c.checked = cb.checked; });
-}
-
 function showDetailModal(tagihan) {
   document.getElementById('mNama').textContent = tagihan.nama_tagihan ? tagihan.nama_tagihan.toLowerCase().replace(/_/g,' ').replace(/\b\w/g, l => l.toUpperCase()) : '-';
   document.getElementById('mTahun').textContent = tagihan.tahun_akademik_tagihan || '-';
@@ -498,36 +514,8 @@ function showDetailModal(tagihan) {
 
 function closeDetailModal() { document.getElementById('detailModal').classList.remove('open'); }
 
-function showPaymentModal() {
-  const rows = getRows('tagihanTableBody').filter(r => r.style.display !== 'none');
-  const checked = rows.map(r => r.querySelector('.tagihan-checkbox:checked')).filter(Boolean);
-  if (!checked.length) { alert('Pilih minimal satu tagihan untuk dibayar!'); return; }
-  const allData = @json($result['data']['tagihan'] ?? []);
-  const selected = checked.map(cb => {
-    const id = cb.value;
-    return allData.find((item, idx) => (item.id && item.id == id) || idx == id) || {};
-  });
-  sessionStorage.setItem('siswa_data', JSON.stringify({
-    nama: '{{ $result["data"]["nama"] ?? "" }}',
-    kelas: '{{ $result["data"]["kelas"] ?? "" }}',
-    va_number: '{{ $result["data"]["va_number"] ?? "" }}'.replace(/^751000/, ''),
-    tahun_akademik: '{{ $result["data"]["tahun_akademik"] ?? "" }}',
-    jenjang: '{{ $result["data"]["jenjang"] ?? "" }}',
-    saldo: '{{ $result["data"]["saldo"] ?? 0 }}',
-    nis: '{{ $result["data"]["nis"] ?? "" }}'
-  }));
-  sessionStorage.setItem('selected_tagihan', JSON.stringify(selected));
-  const modal = document.getElementById('paymentModal');
-  document.getElementById('paymentContent').innerHTML = '<p style="padding:2rem;text-align:center;color:var(--text2);font-size:13px">Memuat halaman pembayaran...</p>';
-  modal.classList.add('open');
-  setTimeout(() => { document.getElementById('paymentContent').innerHTML = `<iframe src="{{ url('/tagihan/view') }}"></iframe>`; }, 500);
-}
-
-function closePaymentModal() { document.getElementById('paymentModal').classList.remove('open'); }
-
 window.addEventListener('click', e => {
   if (e.target.id === 'detailModal') closeDetailModal();
-  if (e.target.id === 'paymentModal') closePaymentModal();
 });
 
 document.getElementById('billForm').addEventListener('submit', e => {
