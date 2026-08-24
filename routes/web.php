@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 
 Route::get('/', function () {
-    return view('index2');
+    return view('index3');
 });
 
 Route::get('/dua', function () {
@@ -14,7 +14,7 @@ Route::get('/dua', function () {
 });
 
 
-Route::get('/list-tahun-akademik', function() {
+Route::get('/list-tahun-akademik', function () {
     try {
         $response = Http::timeout(30)
             ->withoutVerifying()
@@ -30,18 +30,17 @@ Route::get('/list-tahun-akademik', function() {
         if ($response->successful()) {
             return response()->json($response->json());
         }
-        
+
         return response()->json([
             'status' => false,
             'message' => 'API tidak memberikan response yang valid'
         ], 500);
-        
     } catch (\Exception $e) {
         \Log::error('Error fetching tahun akademik', [
             'error' => $e->getMessage(),
             'trace' => $e->getTraceAsString()
         ]);
-        
+
         return response()->json([
             'status' => false,
             'message' => 'Gagal mengambil data tahun akademik',
@@ -50,7 +49,7 @@ Route::get('/list-tahun-akademik', function() {
     }
 });
 
-Route::post('/cek-tagihan', function(Request $request) {
+Route::post('/cek-tagihan', function (Request $request) {
     try {
         $response = Http::timeout(30)
             ->withoutVerifying()
@@ -71,18 +70,17 @@ Route::post('/cek-tagihan', function(Request $request) {
         if ($response->successful()) {
             return response()->json($response->json());
         }
-        
+
         return response()->json([
             'status' => false,
             'message' => 'Gagal mengecek tagihan'
         ], 500);
-        
     } catch (\Exception $e) {
         \Log::error('Error cek-tagihan', [
             'error' => $e->getMessage(),
             'trace' => $e->getTraceAsString()
         ]);
-        
+
         return response()->json([
             'status' => false,
             'message' => 'Terjadi kesalahan',
@@ -91,7 +89,7 @@ Route::post('/cek-tagihan', function(Request $request) {
     }
 })->name('cek-tagihan');
 
-Route::post('/generate-va', function(Request $request) {
+Route::post('/generate-va', function (Request $request) {
     try {
         $response = Http::timeout(30)
             ->withoutVerifying()
@@ -99,7 +97,8 @@ Route::post('/generate-va', function(Request $request) {
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json'
             ])
-            ->post('http://10.99.23.111/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=generate-va', 
+            ->post(
+                'http://10.99.23.111/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=generate-va',
                 $request->all()
             );
 
@@ -111,18 +110,17 @@ Route::post('/generate-va', function(Request $request) {
         if ($response->successful()) {
             return response()->json($response->json());
         }
-        
+
         return response()->json([
             'status' => false,
             'message' => 'Gagal generate VA'
         ], 500);
-        
     } catch (\Exception $e) {
         \Log::error('Error generate-va', [
             'error' => $e->getMessage(),
             'trace' => $e->getTraceAsString()
         ]);
-        
+
         return response()->json([
             'status' => false,
             'message' => 'Terjadi kesalahan',

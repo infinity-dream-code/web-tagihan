@@ -462,7 +462,7 @@
             
             if (typeof turnstile !== 'undefined') {
                 turnstile.render('#turnstile-widget', {
-                    sitekey: '0x4AAAAAAB6RJ3SKgO_PITdZ',
+                    sitekey: '0x4AAAAAAB5x165SUz53So6y',
                     theme: theme,
                     callback: function(token) {
                         turnstileToken = token;

@@ -55,71 +55,102 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow
 </div>
 
 <div id="vaResult" class="mb-4"></div>
-<div class="flex gap-3">
+
+<div class="flex gap-3" id="actionButtons">
 <button onclick="window.parent.closePaymentModal()" class="flex-1 bg-slate-600 hover:bg-slate-500 text-white py-3 rounded-lg font-semibold text-sm transition-colors btn-close">Tutup</button>
 <button onclick="prosesPembayaran()" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold text-sm transition-colors btn-submit" id="btnSubmit">Buat Nomor VA</button>
-</div></div>
+</div>
+</div>
 
 <script>
-let turnstileToken=null;
+let turnstileToken = null;
 
 function applyTheme(){
-const t=(typeof localStorage!=='undefined'?localStorage.getItem('theme'):null)||'dark',b=document.body;
-if(t==='light'){
-b.classList.add('light-mode');b.classList.remove('bg-slate-800');b.classList.add('bg-gray-100');
-document.querySelectorAll('.card-section').forEach(e=>{e.classList.remove('bg-slate-700');e.classList.add('bg-white','border','border-gray-200')});
-document.querySelectorAll('.section-title').forEach(e=>{e.classList.remove('text-white');e.classList.add('text-gray-900')});
-document.querySelectorAll('.info-label').forEach(e=>{e.classList.remove('text-gray-400');e.classList.add('text-gray-600')});
-document.querySelectorAll('.info-value').forEach(e=>{e.classList.remove('text-white');e.classList.add('text-gray-900')});
-document.querySelectorAll('.table-wrapper').forEach(e=>{e.classList.remove('border-slate-600');e.classList.add('border-gray-300')});
-document.querySelectorAll('.table-header').forEach(e=>{e.classList.remove('bg-slate-600');e.classList.add('bg-gray-200')});
-document.querySelectorAll('.th-cell').forEach(e=>{e.classList.remove('text-white','border-slate-500');e.classList.add('text-gray-900','border-gray-300')});
-document.querySelectorAll('.table-body').forEach(e=>{e.classList.remove('bg-slate-800');e.classList.add('bg-white')});
-document.querySelectorAll('.loading-cell').forEach(e=>{e.classList.remove('text-gray-400');e.classList.add('text-gray-600')});
-document.querySelectorAll('.btn-close').forEach(e=>{e.classList.remove('bg-slate-600');e.classList.add('bg-gray-300','text-gray-900')});
+const t = (typeof localStorage !== 'undefined' ? localStorage.getItem('theme') : null) || 'dark';
+const b = document.body;
+if(t === 'light'){
+b.classList.add('light-mode'); b.classList.remove('bg-slate-800'); b.classList.add('bg-gray-100');
+document.querySelectorAll('.card-section').forEach(e=>{e.classList.remove('bg-slate-700'); e.classList.add('bg-white','border','border-gray-200')});
+document.querySelectorAll('.section-title').forEach(e=>{e.classList.remove('text-white'); e.classList.add('text-gray-900')});
+document.querySelectorAll('.info-label').forEach(e=>{e.classList.remove('text-gray-400'); e.classList.add('text-gray-600')});
+document.querySelectorAll('.info-value').forEach(e=>{e.classList.remove('text-white'); e.classList.add('text-gray-900')});
+document.querySelectorAll('.table-wrapper').forEach(e=>{e.classList.remove('border-slate-600'); e.classList.add('border-gray-300')});
+document.querySelectorAll('.table-header').forEach(e=>{e.classList.remove('bg-slate-600'); e.classList.add('bg-gray-200')});
+document.querySelectorAll('.th-cell').forEach(e=>{e.classList.remove('text-white','border-slate-500'); e.classList.add('text-gray-900','border-gray-300')});
+document.querySelectorAll('.table-body').forEach(e=>{e.classList.remove('bg-slate-800'); e.classList.add('bg-white')});
+document.querySelectorAll('.loading-cell').forEach(e=>{e.classList.remove('text-gray-400'); e.classList.add('text-gray-600')});
+document.querySelectorAll('.btn-close').forEach(e=>{e.classList.remove('bg-slate-600'); e.classList.add('bg-gray-300','text-gray-900')});
 }}
 
-window.onload=function(){
+function hideSubmitButton(){
+const actionDiv = document.getElementById('actionButtons');
+const submitBtn = document.getElementById('btnSubmit');
+if(submitBtn) submitBtn.style.display = 'none';
+}
+
+function initTurnstile(){
+const p = (typeof localStorage !== 'undefined' ? localStorage.getItem('theme') : null) || 'dark';
+const th = p === 'light' ? 'light' : 'dark';
+
+const widget = document.getElementById('turnstile-widget');
+widget.innerHTML = '';
+
+if(typeof turnstile !== 'undefined'){
+turnstile.render('#turnstile-widget', {
+sitekey: '0x4AAAAAAC4fiI9wNb1AMZ3I',
+theme: th,
+callback: function(token){
+turnstileToken = token;
+},
+'error-callback': function(){
+turnstileToken = null;
+}
+});
+} else {
+setTimeout(initTurnstile, 100);
+}
+}
+
+window.onload = function(){
 applyTheme();
-const s=JSON.parse((typeof sessionStorage!=='undefined'?sessionStorage.getItem('siswa_data'):null)||'{}'),
-t=JSON.parse((typeof sessionStorage!=='undefined'?sessionStorage.getItem('selected_tagihan'):null)||'[]');
-document.getElementById('siswa_nama').textContent=s.nama||'-';
-document.getElementById('siswa_kelas').textContent=s.kelas||'-';
-document.getElementById('siswa_va').textContent=s.va_number||'-';
-document.getElementById('siswa_tahun').textContent=s.tahun_akademik||'-';
-const d=document.getElementById('tagihan_tbody'),c=document.getElementById('item_count'),tb=document.getElementById('total_bayar');
-if(t.length===0){d.innerHTML='<tr><td colspan="5" class="px-4 py-6 text-center text-gray-400 text-sm loading-cell">Tidak ada tagihan yang dipilih</td></tr>';c.textContent='0 Item';tb.textContent='Rp 0';applyThemeToTable();}
-else{
-let total=0,h='';
-t.forEach((i,x)=>{
-let n=typeof i.total_tagihan==='string'?parseInt(i.total_tagihan.replace(/\./g,'').replace(/,/g,'')):parseInt(i.total_tagihan);
-total+=n;
-const nm=i.nama_tagihan.toLowerCase().replace(/_/g,' ').replace(/\b\w/g,l=>l.toUpperCase());
-const th=i.tahun_akademik_tagihan||s.tahun_akademik||'-';
-h+=`<tr class="hover:bg-slate-700 border-t border-slate-600 row-item">
+
+const s = JSON.parse((typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('siswa_data') : null) || '{}');
+const t = JSON.parse((typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('selected_tagihan') : null) || '[]');
+
+document.getElementById('siswa_nama').textContent = s.nama || '-';
+document.getElementById('siswa_kelas').textContent = s.kelas || '-';
+document.getElementById('siswa_va').textContent = s.va_number || '-';
+document.getElementById('siswa_tahun').textContent = s.tahun_akademik || '-';
+
+const d = document.getElementById('tagihan_tbody');
+const c = document.getElementById('item_count');
+const tb = document.getElementById('total_bayar');
+
+if(t.length === 0){
+d.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-gray-400 text-sm loading-cell">Tidak ada tagihan yang dipilih</td></tr>';
+c.textContent = '0 Item';
+tb.textContent = 'Rp 0';
+} else {
+let total = 0, h = '';
+t.forEach((i, x) => {
+let n = typeof i.total_tagihan === 'string' ? parseInt(i.total_tagihan.replace(/\./g,'').replace(/,/g,'')) : parseInt(i.total_tagihan);
+total += n;
+const nm = i.nama_tagihan.toLowerCase().replace(/_/g,' ').replace(/\b\w/g, l => l.toUpperCase());
+const th = i.tahun_akademik_tagihan || s.tahun_akademik || '-';
+h += `<tr class="hover:bg-slate-700 border-t border-slate-600 row-item">
 <td class="px-4 py-3 text-white text-sm border-r border-slate-600 td-cell">${x+1}</td>
 <td class="px-4 py-3 text-white text-sm border-r border-slate-600 td-cell">${nm}</td>
 <td class="px-4 py-3 text-white text-sm border-r border-slate-600 td-cell">${th}</td>
-<td class="px-4 py-3 text-white text-sm border-r border-slate-600 td-cell">${i.periode||'-'}</td>
+<td class="px-4 py-3 text-white text-sm border-r border-slate-600 td-cell">${i.periode || '-'}</td>
 <td class="px-4 py-3 text-white text-sm text-right font-semibold td-cell">Rp ${n.toLocaleString('id-ID')}</td></tr>`;
 });
-d.innerHTML=h;c.textContent=`${t.length} Item`;tb.textContent=`Rp ${total.toLocaleString('id-ID')}`;applyThemeToTable();}
+d.innerHTML = h;
+c.textContent = `${t.length} Item`;
+tb.textContent = `Rp ${total.toLocaleString('id-ID')}`;
+}
+
 initTurnstile();
 };
-
-function applyThemeToTable(){
-const t=(typeof localStorage!=='undefined'?localStorage.getItem('theme'):null)||'dark';
-if(t==='light'){
-document.querySelectorAll('.row-item').forEach(e=>{e.classList.remove('hover:bg-slate-700','border-slate-600');e.classList.add('hover:bg-gray-50','border-gray-200')});
-document.querySelectorAll('.td-cell').forEach(e=>{e.classList.remove('text-white','border-slate-600');e.classList.add('text-gray-900','border-gray-300')});
-document.querySelectorAll('.loading-cell').forEach(e=>{e.classList.remove('text-gray-400');e.classList.add('text-gray-600')});
-}}
-
-function initTurnstile(){
-const p=(typeof localStorage!=='undefined'?localStorage.getItem('theme'):null)||'dark',th=p==='light'?'light':'dark';
-if(typeof turnstile!=='undefined'){turnstile.render('#turnstile-widget',{sitekey:'0x4AAAAAAB6RJ3SKgO_PITdZ',theme:th,callback:function(t){turnstileToken=t;},'error-callback':function(){turnstileToken=null;alert('Verifikasi gagal! Silakan refresh halaman.');}});}
-else setTimeout(initTurnstile,100);
-}
 
 async function prosesPembayaran(){
 const btn = document.getElementById('btnSubmit');
@@ -127,121 +158,94 @@ btn.disabled = true;
 btn.textContent = 'Memproses...';
 
 try {
+if(!turnstileToken){
+alert('Silakan selesaikan verifikasi keamanan terlebih dahulu!');
+btn.disabled = false;
+btn.textContent = 'Buat Nomor VA';
+return;
+}
+
+const s = JSON.parse((typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('siswa_data') : null) || '{}');
+const t = JSON.parse((typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('selected_tagihan') : null) || '[]');
+
+if(t.length === 0){
+alert('Tidak ada tagihan yang dipilih!');
+return;
+}
+
+let total = 0, ids = [];
+t.forEach(i => {
+let n = typeof i.total_tagihan === 'string' ? parseInt(i.total_tagihan.replace(/\./g,'').replace(/,/g,'')) : parseInt(i.total_tagihan);
+total += n;
+ids.push(i.AA || 0);
+});
+
+const nc = (s.va_number || '').replace(/^751000/,'');
 
 const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-if (!csrfMeta) {
-    alert('Error: CSRF token tidak ditemukan. Silakan refresh halaman.');
-    return;
-}
-
-if(!turnstileToken){
-    alert('Silakan selesaikan verifikasi keamanan terlebih dahulu!');
-    return;
-}
-
-const s=JSON.parse((typeof sessionStorage!=='undefined'?sessionStorage.getItem('siswa_data'):null)||'{}');
-const t=JSON.parse((typeof sessionStorage!=='undefined'?sessionStorage.getItem('selected_tagihan'):null)||'[]');
-
-if(t.length===0){
-    alert('Tidak ada tagihan yang dipilih!');
-    return;
-}
-
-let total=0,ids=[];
-t.forEach(i=>{
-    let n=typeof i.total_tagihan==='string'?parseInt(i.total_tagihan.replace(/\./g,'').replace(/,/g,'')):parseInt(i.total_tagihan);
-    total+=n;
-    ids.push(i.AA||0);
-});
-
-const nc=(s.va_number||'').replace(/^751000/,'');
-
-console.log('Request cek-tagihan:', {va: nc, tahun_akademik: s.tahun_akademik});
 
 const r = await fetch("{{ route('cek-tagihan') }}", {
-    method: "POST",
-    headers: { 
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "X-CSRF-TOKEN": csrfMeta.getAttribute('content')
-    },
-    body: JSON.stringify({ 
-        va: nc, 
-        tahun_akademik: s.tahun_akademik 
-    })
+method: "POST",
+headers: { 
+"Content-Type": "application/json",
+"Accept": "application/json",
+"X-CSRF-TOKEN": csrfMeta.getAttribute('content')
+},
+body: JSON.stringify({ va: nc, tahun_akademik: s.tahun_akademik })
 });
 
-console.log('Response status:', r.status);
-const responseText = await r.text();
-console.log('Response text:', responseText);
-
-let rd;
-try {
-    rd = JSON.parse(responseText);
-} catch (e) {
-    console.error('JSON Parse Error:', e);
-    alert('Error: Server mengembalikan response yang tidak valid. Silakan cek console untuk detail.');
-    return;
-}
+const rd = await r.json();
 
 if(!rd.status || !rd.data || !rd.data.id){
-    alert('Data siswa tidak ditemukan! ' + (rd.message || ''));
-    return;
+alert('Data siswa tidak ditemukan!');
+return;
 }
 
-const cid=rd.data.id;
-const ncst=rd.data.num2nd;
-const payload={
-    custid:cid,
-    nocust:ncst,
-    namacust:s.nama,
-    array_tagihan:ids.join(','),
-    total:total
+const cid = rd.data.id;
+const ncst = rd.data.num2nd;
+
+const payload = {
+custid: cid,
+nocust: ncst,
+namacust: s.nama,
+array_tagihan: ids.join(','),
+total: total
 };
 
-console.log('Request generate-va:', payload);
-
 const rr = await fetch("{{ route('generate-va') }}", {
-    method: "POST",
-    headers: { 
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "X-CSRF-TOKEN": csrfMeta.getAttribute('content')
-    },
-    body: JSON.stringify(payload)
+method: "POST",
+headers: { 
+"Content-Type": "application/json",
+"Accept": "application/json",
+"X-CSRF-TOKEN": csrfMeta.getAttribute('content')
+},
+body: JSON.stringify(payload)
 });
 
-const responseText2 = await rr.text();
-console.log('Generate VA Response:', responseText2);
-
-let d;
-try {
-    d = JSON.parse(responseText2);
-} catch (e) {
-    console.error('JSON Parse Error:', e);
-    alert('Error: Server mengembalikan response yang tidak valid saat generate VA.');
-    return;
-}
+const d = await rr.json();
 
 if(d.status){
-    const v=document.getElementById('vaResult');
-    const pt=(typeof localStorage!=='undefined'?localStorage.getItem('theme'):null)||'dark';
-    const isDark=pt==='dark';
-    
-    v.innerHTML=`<div class="${isDark?'bg-slate-700 border-slate-600':'bg-white border-gray-200'} rounded-lg shadow-lg p-6 text-center border">
-    <h2 class="text-xl font-bold ${isDark?'text-white':'text-gray-900'} mb-3">Nomor Virtual Account</h2>
-    <p class="text-3xl font-mono ${isDark?'text-green-400':'text-green-600'} mb-4 font-bold">${d.data.va_number}</p>
-    <div class="space-y-2 mb-4">
-    <p class="${isDark?'text-white':'text-gray-900'}">Bank: <span class="font-semibold">Muamalat</span></p>
-    <p class="${isDark?'text-white':'text-gray-900'}">Total: <span class="font-semibold">Rp ${total.toLocaleString('id-ID')}</span></p></div>
-    <button onclick="window.parent.closePaymentModal()" class="${isDark?'bg-slate-600 hover:bg-slate-500':'bg-gray-300 hover:bg-gray-400 text-gray-900'} text-white py-2 px-6 rounded-lg font-semibold text-sm transition-colors">Tutup</button></div>`;
+hideSubmitButton();
+
+const v = document.getElementById('vaResult');
+const isDark = (typeof localStorage !== 'undefined' ? localStorage.getItem('theme') : null) || 'dark' === 'dark';
+
+v.innerHTML = `<div class="${isDark ? 'bg-slate-700 border-slate-600' : 'bg-white border-gray-200'} rounded-lg shadow-lg p-6 text-center border">
+<h2 class="text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-3">Nomor Virtual Account</h2>
+<p class="text-3xl font-mono ${isDark ? 'text-green-400' : 'text-green-600'} mb-4 font-bold">${d.data.va_number}</p>
+<div class="space-y-2 mb-4">
+<p class="${isDark ? 'text-white' : 'text-gray-900'}">Bank: <span class="font-semibold">Muamalat</span></p>
+<p class="${isDark ? 'text-white' : 'text-gray-900'}">Total: <span class="font-semibold">Rp ${total.toLocaleString('id-ID')}</span></p>
+</div>
+<button onclick="window.parent.closePaymentModal()" class="${isDark ? 'bg-slate-600 hover:bg-slate-500' : 'bg-gray-300 hover:bg-gray-400 text-gray-900'} text-white py-2 px-6 rounded-lg font-semibold text-sm transition-colors">Tutup</button>
+</div>`;
 } else {
-    alert('Gagal membuat Virtual Account! ' + (d.message || 'Silakan coba lagi.'));
+alert('Gagal membuat Virtual Account! ' + (d.message || 'Silakan coba lagi.'));
 }
 
 } catch(e) {
-console.error('Error detail:', e);
-alert('Terjadi kesalahan: ' + e.message);
+console.error(e);
+alert('Terjadi kesalahan saat memproses pembayaran.');
 } finally {
 btn.disabled = false;
 btn.textContent = 'Buat Nomor VA';
