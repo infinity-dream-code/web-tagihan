@@ -136,7 +136,7 @@ h1{font-size:18px}
   </div>
 
   <div class="card">
-    <form method="POST" action="{{ route('tagihan.cek2') }}" id="billForm">
+    <form method="POST" action="/" id="billForm">
       @csrf
       <div class="section-title">Informasi akun</div>
       <div class="field">
@@ -419,7 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const s = document.getElementById('academic_year');
   if (s) {
-    fetch("{{ url('/list-tahun-akademik') }}")
+    fetch("/list-tahun-akademik")
       .then(r => r.json())
       .then(data => {
         s.innerHTML = '';

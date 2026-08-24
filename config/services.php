@@ -36,4 +36,8 @@ return [
         'secret_key' => env('TURNSTILE_SECRET_KEY'),
     ],
 
+    'tagihan_ws' => [
+        'url' => env('WS_TAGIHAN_URL', 'http://103.23.103.43/WEB_TAGIHAN_PROJECT/WS_TAGIHAN_AL_FAUZAN/index.php'),
+    ],
+
 ];

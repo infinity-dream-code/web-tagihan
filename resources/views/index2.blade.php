@@ -374,7 +374,7 @@
 
         document.addEventListener("DOMContentLoaded", function() {
             const select = document.getElementById("academic_year");
-            fetch("{{ url('/list-tahun-akademik') }}")
+            fetch("/list-tahun-akademik")
                 .then(response => response.json())
                 .then(data => {
                     select.innerHTML = "";

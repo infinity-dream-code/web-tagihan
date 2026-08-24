@@ -14,40 +14,7 @@ Route::get('/dua', function () {
 });
 
 
-Route::get('/list-tahun-akademik', function () {
-    try {
-        $response = Http::timeout(30)
-            ->withoutVerifying()
-            ->get('http://10.99.23.111/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php', [
-                'path' => 'list-tahun-aka'
-            ]);
-
-        \Log::info('WS Response', [
-            'status' => $response->status(),
-            'body' => $response->body()
-        ]);
-
-        if ($response->successful()) {
-            return response()->json($response->json());
-        }
-
-        return response()->json([
-            'status' => false,
-            'message' => 'API tidak memberikan response yang valid'
-        ], 500);
-    } catch (\Exception $e) {
-        \Log::error('Error fetching tahun akademik', [
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-
-        return response()->json([
-            'status' => false,
-            'message' => 'Gagal mengambil data tahun akademik',
-            'error' => $e->getMessage()
-        ], 500);
-    }
-});
+Route::get('/list-tahun-akademik', [TagihanController::class, 'listTahunAkademik']);
 
 Route::post('/cek-tagihan', function (Request $request) {
     try {
@@ -57,7 +24,7 @@ Route::post('/cek-tagihan', function (Request $request) {
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json'
             ])
-            ->post('http://10.99.23.111/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=cek-tagihan', [
+            ->post(config('services.tagihan_ws.url').'?path=cek-tagihan', [
                 'va' => $request->input('va'),
                 'tahun_akademik' => $request->input('tahun_akademik')
             ]);
@@ -98,7 +65,7 @@ Route::post('/generate-va', function (Request $request) {
                 'Accept' => 'application/json'
             ])
             ->post(
-                'http://10.99.23.111/WEB_TAGIHAN_PROJECT/WS_DEMO_MULTIPLE/index.php?path=generate-va',
+                config('services.tagihan_ws.url').'?path=generate-va',
                 $request->all()
             );
 
