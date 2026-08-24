@@ -252,7 +252,7 @@ h1{font-size:1.15rem}
           <div class="sf"><label>Kelas</label><p>{{ $result['data']['kelas'] ?? '-' }}</p></div>
           <div class="sf"><label>Angkatan</label><p>{{ $academic_year ?: '-' }}</p></div>
           <div class="sf"><label>Saldo VA</label><p>Rp {{ number_format($result['data']['saldo'] ?? 0, 0, ',', '.') }}</p></div>
-          <div class="sf"><label>No. VA</label><p>{{ $result['data']['va_number'] ?? '-' }}</p></div>
+          <div class="sf"><label>NOVA</label><p>{{ $result['data']['va_number'] ?? '-' }}</p></div>
           <div class="sf"><label>Jenjang</label><p>{{ $result['data']['jenjang'] ?? '-' }}</p></div>
         </div>
 

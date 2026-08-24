@@ -153,7 +153,7 @@
                             <p class="text-white font-semibold text-lg main-text">Rp. {{ number_format($result['data']['saldo'] ?? 0, 0, ',', '.') }}</p>
                         </div>
                         <div>
-                            <p class="text-gray-400 text-sm secondary-text">No VA</p>
+                            <p class="text-gray-400 text-sm secondary-text">NOVA</p>
                             <p class="text-white font-semibold text-lg main-text">{{ $result['data']['va_number'] ?? '-' }}</p>
                         </div>
                         <div>
