@@ -180,7 +180,7 @@ total += n;
 ids.push(i.AA || 0);
 });
 
-const nc = (s.va_number || '').replace(/^751000/,'');
+const nc = (s.va_number || '').replace(/^797766/,'');
 
 const csrfMeta = document.querySelector('meta[name="csrf-token"]');
 
