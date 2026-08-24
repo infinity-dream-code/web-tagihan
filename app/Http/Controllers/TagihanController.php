@@ -22,7 +22,13 @@ class TagihanController extends Controller
     {
         $va = preg_replace('/\s+/', '', (string) $va);
 
-        return (string) preg_replace('/^(797766|751000)/', '', $va);
+        if (preg_match('/^(797766|751000)(\d+)$/', $va, $m)) {
+            $va = $m[2];
+        }
+
+        $nocust = ltrim($va, '0');
+
+        return $nocust !== '' ? $nocust : $va;
     }
 
     public function cek(Request $request)
