@@ -179,7 +179,7 @@ h1{font-size:1.15rem}
       <div class="section-title">Informasi akun</div>
       <div class="field">
         <label>Nomor virtual account <em>*</em></label>
-        <input type="text" name="no_cust" id="noCust" inputmode="numeric" autocomplete="username" placeholder="7977660001234567" value="{{ old('no_cust', $va ?? '') }}" required>
+        <input type="text" name="no_cust" id="noCust" inputmode="numeric" autocomplete="username" placeholder="797766xxx" value="{{ old('no_cust', $va ?? '') }}" required>
       </div>
       <div class="field">
         <label>Password <em>*</em></label>

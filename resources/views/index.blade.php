@@ -136,7 +136,7 @@
                 @csrf
                 <div class="mb-6">
                     <label class="block text-white label-text mb-2">Nomor Virtual Account <span class="text-red-500">*</span></label>
-                    <input type="text" name="no_cust" id="noCust" placeholder="797766xxxxxxxx" class="w-full px-4 py-3 rounded-lg border bg-slate-700 text-white border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 input-field" required/>
+                    <input type="text" name="no_cust" id="noCust" placeholder="797766xxx" class="w-full px-4 py-3 rounded-lg border bg-slate-700 text-white border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 input-field" required/>
                 </div>
                <div class="mb-6">
     <label class="block text-white label-text mb-2">
