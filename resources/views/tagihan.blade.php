@@ -97,7 +97,7 @@ widget.innerHTML = '';
 
 if(typeof turnstile !== 'undefined'){
 turnstile.render('#turnstile-widget', {
-sitekey: '0x4AAAAAAC4fiI9wNb1AMZ3I',
+sitekey: @json(config('services.turnstile.site_key')),
 theme: th,
 callback: function(token){
 turnstileToken = token;

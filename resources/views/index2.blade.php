@@ -419,7 +419,7 @@
     const theme = currentTheme === 'light' ? 'light' : 'dark';
 
     turnstile.render('#turnstile-widget', {
-        sitekey: '0x4AAAAAAC4fiI9wNb1AMZ3I',   // ← ganti ke dummy key kalau masih localhost: 1x00000000000000000000AA
+        sitekey: @json(config('services.turnstile.site_key')),
         theme: theme,
         size: 'normal',
         retry: 'auto',

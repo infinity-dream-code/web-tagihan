@@ -399,7 +399,7 @@ function initTurnstile() {
   document.getElementById('cfToken').value = '';
   if (typeof turnstile === 'undefined') { setTimeout(initTurnstile, 150); return; }
   turnstile.render('#turnstile-widget', {
-    sitekey: '0x4AAAAAAC4fiI9wNb1AMZ3I',
+    sitekey: @json(config('services.turnstile.site_key')),
     theme: currentTheme === 'dark' ? 'dark' : 'light',
     size: 'normal',
     retry: 'auto',
