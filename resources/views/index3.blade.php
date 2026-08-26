@@ -64,10 +64,6 @@ html.dark .field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='h
 .field input:focus,.field select:focus{border-color:var(--accent);background-color:var(--surface);box-shadow:0 0 0 4px rgba(21,128,61,.12)}
 .field input::placeholder{color:var(--text3)}
 .field select option{background:var(--surface);color:var(--text)}
-.pw-wrap{position:relative}
-.pw-wrap input{padding-right:48px}
-.pw-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center}
-.pw-eye:hover{color:var(--text2);background:var(--surface)}
 .turnstile-area{display:flex;justify-content:center;padding:.35rem 0;overflow-x:auto;max-width:100%}
 .submit-btn{width:100%;min-height:50px;padding:13px 16px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:1.15rem;transition:background .15s,transform .15s}
 .submit-btn:hover{background:var(--accent-h)}
@@ -180,16 +176,6 @@ h1{font-size:1.15rem}
       <div class="field">
         <label>Nomor virtual account <em>*</em></label>
         <input type="text" name="no_cust" id="noCust" inputmode="numeric" autocomplete="username" placeholder="797766xxx" value="{{ old('no_cust', $va ?? '') }}" required>
-      </div>
-      <div class="field">
-        <label>Password <em>*</em></label>
-        <div class="pw-wrap">
-          <input type="password" name="password" id="pwField" autocomplete="current-password" placeholder="Masukkan password" required>
-          <button type="button" class="pw-eye" onclick="togglePw()" aria-label="Tampilkan password">
-            <svg id="pwIconEye" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-            <svg id="pwIconOff" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.96 9.96 0 011.255-2.255M9.772 9.772A3 3 0 0114.23 14.23M3 3l18 18"/></svg>
-          </button>
-        </div>
       </div>
       <div class="field">
         <label>Tahun akademik <em>*</em></label>
@@ -437,14 +423,6 @@ const preselectedYear = @json(old('academic_year', $academic_year ?? 'all'));
 
 const ICON_MOON = '<path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>';
 const ICON_SUN = '<path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>';
-
-function togglePw() {
-  const f = document.getElementById('pwField');
-  const e = document.getElementById('pwIconEye');
-  const o = document.getElementById('pwIconOff');
-  if (f.type === 'password') { f.type = 'text'; e.style.display = 'none'; o.style.display = 'block'; }
-  else { f.type = 'password'; e.style.display = 'block'; o.style.display = 'none'; }
-}
 
 function syncThemeUI(theme) {
   currentTheme = theme;

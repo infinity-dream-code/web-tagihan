@@ -70,23 +70,21 @@ class TagihanController extends Controller
     {
         $request->validate([
             'no_cust' => 'required|string',
-            'password' => 'required|string',
             'academic_year' => 'required|string'
         ]);
 
         $response = Http::timeout(30)
             ->withoutVerifying()
-            ->post($this->wsUrl('cek-tagihan-pw'), [
+            ->post($this->wsUrl('cek-tagihan'), [
                 'va' => self::normalizeVa($request->no_cust),
-                'password' => $request->password,
                 'tahun_akademik' => $request->academic_year
             ]);
 
         $result = $this->withNova($response->json(), $request->no_cust);
 
-        if (!$result['status']) {
+        if (empty($result['status'])) {
             return back()->with([
-                'error' => $result['message'],
+                'error' => $result['message'] ?? 'VA salah, atau data tidak ditemukan',
                 'va' => $request->no_cust,
                 'academic_year' => $request->academic_year
             ]);
