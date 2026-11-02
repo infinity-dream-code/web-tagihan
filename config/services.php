@@ -32,12 +32,13 @@ return [
     ],
 
     'turnstile' => [
+        'enabled' => env('TURNSTILE_ENABLED', false),
         'site_key' => env('TURNSTILE_SITE_KEY'),
         'secret_key' => env('TURNSTILE_SECRET_KEY'),
     ],
 
     'tagihan_ws' => [
-        'url' => env('WS_TAGIHAN_URL', 'http://103.23.103.43/WEB_TAGIHAN_PROJECT/WS_TAGIHAN_AL_FAUZAN/index.php'),
+        'url' => env('WS_TAGIHAN_URL') ?: 'http://103.23.103.43/WEB_TAGIHAN_PROJECT/WS_TAGIHAN_AL_FAUZAN/index.php',
     ],
 
 ];

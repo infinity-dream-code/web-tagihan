@@ -5,8 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>Konfirmasi Pembayaran</title>
+@include('pwa-head')
 <script src="https://cdn.tailwindcss.com"></script>
+@if(config('services.turnstile.enabled', false) && config('services.turnstile.site_key'))
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+@endif
 <style>
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow-x:hidden}
 .modal-content{max-height:100vh;overflow-y:auto}
@@ -49,10 +52,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow
 <span class="text-white font-bold text-xl" id="total_bayar">Rp 0</span>
 </div></div>
 
+@if(config('services.turnstile.enabled', false) && config('services.turnstile.site_key'))
 <div class="bg-slate-700 rounded-lg shadow-lg p-5 mb-4 card-section">
 <label class="block text-white font-semibold mb-3 text-sm section-title">Verifikasi Keamanan</label>
 <div id="turnstile-widget" class="flex justify-center"></div>
 </div>
+@endif
 
 <div id="vaResult" class="mb-4"></div>
 
@@ -63,7 +68,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow
 </div>
 
 <script>
-let turnstileToken = null;
+const turnstileEnabled = @json((bool)(config('services.turnstile.enabled', false) && config('services.turnstile.site_key')));
+let turnstileToken = turnstileEnabled ? null : 'bypass';
 
 function applyTheme(){
 const t = (typeof localStorage !== 'undefined' ? localStorage.getItem('theme') : null) || 'dark';
@@ -89,10 +95,12 @@ if(submitBtn) submitBtn.style.display = 'none';
 }
 
 function initTurnstile(){
+if(!turnstileEnabled) return;
 const p = (typeof localStorage !== 'undefined' ? localStorage.getItem('theme') : null) || 'dark';
 const th = p === 'light' ? 'light' : 'dark';
 
 const widget = document.getElementById('turnstile-widget');
+if(!widget) return;
 widget.innerHTML = '';
 
 if(typeof turnstile !== 'undefined'){
@@ -158,7 +166,7 @@ btn.disabled = true;
 btn.textContent = 'Memproses...';
 
 try {
-if(!turnstileToken){
+if(turnstileEnabled && !turnstileToken){
 alert('Silakan selesaikan verifikasi keamanan terlebih dahulu!');
 btn.disabled = false;
 btn.textContent = 'Buat Nomor VA';

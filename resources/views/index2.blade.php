@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cek Tagihan dan Pembayaran</title>
+    @include('pwa-head')
     <script src="https://cdn.tailwindcss.com"></script>
+@if(config('services.turnstile.enabled', false) && config('services.turnstile.site_key'))
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+@endif
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         #togglePassword svg { color: #e2e8f0; }
@@ -88,11 +91,13 @@
                         <option value="">Loading...</option>
                     </select>
                 </div>
+                @if(config('services.turnstile.enabled', false) && config('services.turnstile.site_key'))
                 <div class="mb-6">
                     <label class="block text-white label-text mb-3">Verifikasi Keamanan <span class="text-red-500">*</span></label>
                     <div id="turnstile-widget" class="flex justify-center mb-2"></div>
                     <input type="hidden" name="cf_turnstile_response" id="cfTurnstileResponse">
                 </div>
+                @endif
                 <button type="submit" name="submit" class="w-full bg-blue-600 text-white py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -354,7 +359,8 @@
 
     <script>
         let currentTheme = 'dark';
-        let turnstileToken = null;
+        const turnstileEnabled = @json((bool)(config('services.turnstile.enabled', false) && config('services.turnstile.site_key')));
+        let turnstileToken = turnstileEnabled ? null : 'bypass';
         let tagihanCurrentPage = 1;
         let tagihanPerPage = 10;
         let tagihanShowAll = false;
@@ -404,42 +410,46 @@
         });
 
         function initTurnstile() {
-    const widget = document.getElementById('turnstile-widget');
-    
-    // Selalu bersihkan dulu widget sebelum render baru (PENTING!)
-    widget.innerHTML = '';
-    turnstileToken = null;
-    document.getElementById('cfTurnstileResponse').value = '';
-
-    if (typeof turnstile === 'undefined') {
-        setTimeout(initTurnstile, 150);
-        return;
-    }
-
-    const theme = currentTheme === 'light' ? 'light' : 'dark';
-
-    turnstile.render('#turnstile-widget', {
-        sitekey: @json(config('services.turnstile.site_key')),
-        theme: theme,
-        size: 'normal',
-        retry: 'auto',
-        callback: function(token) {
-            turnstileToken = token;
-            document.getElementById('cfTurnstileResponse').value = token;
-        },
-        'error-callback': function(errorCode) {
-            console.log('Turnstile error code:', errorCode);  // lihat di console F12
+            if (!turnstileEnabled) return;
+            const widget = document.getElementById('turnstile-widget');
+            if (!widget) return;
+            
+            // Selalu bersihkan dulu widget sebelum render baru (PENTING!)
+            widget.innerHTML = '';
             turnstileToken = null;
-            document.getElementById('cfTurnstileResponse').value = '';
-            // JANGAN langsung alert, biar tidak ganggu user
-            // alert('Verifikasi gagal! Silakan refresh halaman.');  ← comment dulu
-        },
-        'expired-callback': function() {
-            turnstileToken = null;
-            document.getElementById('cfTurnstileResponse').value = '';
+            const el = document.getElementById('cfTurnstileResponse');
+            if (el) el.value = '';
+
+            if (typeof turnstile === 'undefined') {
+                setTimeout(initTurnstile, 150);
+                return;
+            }
+
+            const theme = currentTheme === 'light' ? 'light' : 'dark';
+
+            turnstile.render('#turnstile-widget', {
+                sitekey: @json(config('services.turnstile.site_key')),
+                theme: theme,
+                size: 'normal',
+                retry: 'auto',
+                callback: function(token) {
+                    turnstileToken = token;
+                    const res = document.getElementById('cfTurnstileResponse');
+                    if (res) res.value = token;
+                },
+                'error-callback': function(errorCode) {
+                    console.log('Turnstile error code:', errorCode);
+                    turnstileToken = null;
+                    const res = document.getElementById('cfTurnstileResponse');
+                    if (res) res.value = '';
+                },
+                'expired-callback': function() {
+                    turnstileToken = null;
+                    const res = document.getElementById('cfTurnstileResponse');
+                    if (res) res.value = '';
+                }
+            });
         }
-    });
-}
         function initTagihanPagination() {
             const tbody = document.getElementById('tagihanTableBody');
             if (!tbody) return;
@@ -733,7 +743,7 @@
         }
 
         document.getElementById('billForm').addEventListener('submit', function(e) {
-            if (!turnstileToken) { e.preventDefault(); alert('Silakan selesaikan verifikasi keamanan terlebih dahulu!'); return false; }
+            if (turnstileEnabled && !turnstileToken) { e.preventDefault(); alert('Silakan selesaikan verifikasi keamanan terlebih dahulu!'); return false; }
         });
 
         function loadThemePreference() {
@@ -749,5 +759,6 @@
             initTurnstile();
         };
     </script>
+    @include('pwa-script')
 </body>
 </html>

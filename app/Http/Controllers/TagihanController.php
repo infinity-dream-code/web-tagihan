@@ -9,7 +9,8 @@ class TagihanController extends Controller
 {
     private function wsUrl(?string $path = null): string
     {
-        $url = rtrim(config('services.tagihan_ws.url'), '?&');
+        $baseUrl = config('services.tagihan_ws.url') ?: 'http://103.23.103.43/WEB_TAGIHAN_PROJECT/WS_TAGIHAN_AL_FAUZAN/index.php';
+        $url = rtrim($baseUrl, '?&');
 
         if ($path) {
             $url .= (str_contains($url, '?') ? '&' : '?').'path='.$path;
@@ -119,9 +120,10 @@ class TagihanController extends Controller
     public function listTahunAkademik()
     {
         try {
+            $baseUrl = config('services.tagihan_ws.url') ?: 'http://103.23.103.43/WEB_TAGIHAN_PROJECT/WS_TAGIHAN_AL_FAUZAN/index.php';
             $response = Http::timeout(30)
                 ->withoutVerifying()
-                ->get(config('services.tagihan_ws.url'), [
+                ->get($baseUrl, [
                     'path' => 'list-tahun-aka'
                 ]);
 

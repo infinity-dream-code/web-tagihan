@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Cek Tagihan | Sulaiman Al Fauzan</title>
-<link rel="icon" type="image/jpeg" href="{{ asset('logo.jpeg') }}">
-<link rel="apple-touch-icon" href="{{ asset('logo.jpeg') }}">
-<meta name="theme-color" content="#14532d">
+@include('pwa-head')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -18,7 +16,9 @@
 })();
 </script>
 <script src="https://cdn.tailwindcss.com"></script>
+@if(config('services.turnstile.enabled', false) && config('services.turnstile.site_key'))
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+@endif
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -53,6 +53,10 @@ h1{font-size:1.35rem;font-weight:700;color:var(--text);line-height:1.25;margin:0
 .theme-btn{display:flex;align-items:center;justify-content:center;gap:7px;min-width:44px;min-height:44px;padding:0 12px;border-radius:12px;border:1px solid var(--border2);background:var(--surface);font-size:13px;color:var(--text2);cursor:pointer;transition:background .15s,border .15s;flex-shrink:0}
 .theme-btn:hover{background:var(--surface2)}
 .theme-label{white-space:nowrap}
+.pwa-install-btn{display:flex;align-items:center;justify-content:center;gap:7px;min-width:44px;min-height:44px;padding:0 14px;border-radius:12px;border:1px solid transparent;background:var(--accent);font-family:inherit;font-size:13px;font-weight:700;color:#fff;cursor:pointer;transition:background .15s,transform .1s;flex-shrink:0}
+.pwa-install-btn:hover{background:var(--accent-h);color:#fff}
+.pwa-install-btn:active{transform:scale(.97)}
+html.dark .pwa-install-btn,html.dark .pwa-install-btn:hover{color:#052e16}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:1.35rem 1.2rem;margin-bottom:1rem;box-shadow:0 10px 28px rgba(19,38,26,.05)}
 .section-title{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--text3);text-transform:uppercase;margin-bottom:1.15rem;padding-bottom:.8rem;border-bottom:1px solid var(--border)}
 .field{margin-bottom:1rem}
@@ -142,6 +146,8 @@ html.dark .error-box p{color:#fca5a5}
 h1{font-size:1.15rem}
 .theme-label{display:none}
 .theme-btn{padding:0;width:44px}
+.pwa-install-btn{width:auto;padding:0 12px}
+.pwa-install-btn .theme-label{display:inline}
 .card{padding:1.1rem .95rem;border-radius:16px}
 .student-grid{gap:.55rem}
 .sf{padding:10px}
@@ -163,10 +169,16 @@ h1{font-size:1.15rem}
         <h1>Cek tagihan</h1>
       </div>
     </div>
-    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn" type="button" aria-label="Ubah tema">
-      <svg id="themeIcon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-      <span class="theme-label" id="themeLabel">Mode gelap</span>
-    </button>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="pwa-install-btn" id="topbarInstallBtn" type="button" aria-label="Download aplikasi" title="Download aplikasi">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        <span class="theme-label" id="topbarInstallLabel">Download</span>
+      </button>
+      <button class="theme-btn" onclick="toggleTheme()" id="themeBtn" type="button" aria-label="Ubah tema">
+        <svg id="themeIcon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        <span class="theme-label" id="themeLabel">Mode gelap</span>
+      </button>
+    </div>
   </div>
 
   <div class="card">
@@ -183,6 +195,7 @@ h1{font-size:1.15rem}
           <option value="">Memuat data...</option>
         </select>
       </div>
+      @if(config('services.turnstile.enabled', false) && config('services.turnstile.site_key'))
       <div class="field">
         <label>Verifikasi keamanan <em>*</em></label>
         <div class="turnstile-area">
@@ -190,6 +203,7 @@ h1{font-size:1.15rem}
           <input type="hidden" name="cf_turnstile_response" id="cfToken">
         </div>
       </div>
+      @endif
       <button type="submit" name="submit" class="submit-btn">
         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         Cek tagihan
@@ -416,7 +430,8 @@ h1{font-size:1.15rem}
 
 <script>
 let currentTheme = (typeof localStorage !== 'undefined' && localStorage.getItem('theme') === 'dark') ? 'dark' : 'light';
-let turnstileToken = null;
+const turnstileEnabled = @json((bool)(config('services.turnstile.enabled', false) && config('services.turnstile.site_key')));
+let turnstileToken = turnstileEnabled ? null : 'bypass';
 let tagihanPage = 1, tagihanPerPageVal = 10, tagihanAll = false;
 let lunasPage = 1, lunasPerPageVal = 10, lunasAll = false;
 const preselectedYear = @json(old('academic_year', $academic_year ?? 'all'));
@@ -449,24 +464,32 @@ function toggleTheme() {
 }
 
 function initTurnstile() {
+  if (!turnstileEnabled) return;
   const w = document.getElementById('turnstile-widget');
+  if (!w) return;
   w.innerHTML = '';
   turnstileToken = null;
-  document.getElementById('cfToken').value = '';
+  const cf = document.getElementById('cfToken');
+  if (cf) cf.value = '';
   if (typeof turnstile === 'undefined') { setTimeout(initTurnstile, 150); return; }
   turnstile.render('#turnstile-widget', {
     sitekey: @json(config('services.turnstile.site_key')),
     theme: currentTheme === 'dark' ? 'dark' : 'light',
     size: window.innerWidth < 420 ? 'compact' : 'normal',
     retry: 'auto',
-    callback: t => { turnstileToken = t; document.getElementById('cfToken').value = t; },
-    'error-callback': () => { turnstileToken = null; document.getElementById('cfToken').value = ''; },
-    'expired-callback': () => { turnstileToken = null; document.getElementById('cfToken').value = ''; }
+    callback: t => { turnstileToken = t; const el = document.getElementById('cfToken'); if (el) el.value = t; },
+    'error-callback': () => { turnstileToken = null; const el = document.getElementById('cfToken'); if (el) el.value = ''; },
+    'expired-callback': () => { turnstileToken = null; const el = document.getElementById('cfToken'); if (el) el.value = ''; }
   });
 }
 
 function resetTurnstile() {
-  if (typeof turnstile !== 'undefined') { document.getElementById('turnstile-widget').innerHTML = ''; setTimeout(initTurnstile, 100); }
+  if (!turnstileEnabled) return;
+  if (typeof turnstile !== 'undefined') {
+    const w = document.getElementById('turnstile-widget');
+    if (w) w.innerHTML = '';
+    setTimeout(initTurnstile, 100);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -590,8 +613,12 @@ window.addEventListener('click', e => {
 });
 
 document.getElementById('billForm').addEventListener('submit', e => {
-  if (!turnstileToken) { e.preventDefault(); alert('Selesaikan verifikasi keamanan terlebih dahulu!'); }
+  if (turnstileEnabled && !turnstileToken) {
+    e.preventDefault();
+    alert('Selesaikan verifikasi keamanan terlebih dahulu!');
+  }
 });
 </script>
+@include('pwa-script')
 </body>
 </html>
